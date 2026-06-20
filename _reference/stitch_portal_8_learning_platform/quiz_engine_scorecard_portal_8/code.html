@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Portal 8 | Chapter Quiz Engine</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#b6c4ff",
+                    "inverse-primary": "#b6c4ff",
+                    "surface-tint": "#4059aa",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#f4f3fa",
+                    "primary": "#00236f",
+                    "inverse-on-surface": "#f1f0f7",
+                    "secondary": "#1b6b4f",
+                    "on-tertiary-fixed": "#341100",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#e3e1e9",
+                    "background": "#faf8ff",
+                    "on-primary-fixed-variant": "#264191",
+                    "primary-container": "#1e3a8a",
+                    "tertiary-container": "#6e2c00",
+                    "on-primary-container": "#90a8ff",
+                    "secondary-container": "#a6f2cf",
+                    "surface-dim": "#dad9e1",
+                    "primary-fixed": "#dce1ff",
+                    "on-secondary-fixed": "#002115",
+                    "on-primary-fixed": "#00164e",
+                    "surface-container": "#eeedf4",
+                    "on-secondary-container": "#247155",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#a6f2cf",
+                    "on-background": "#1a1b21",
+                    "on-error": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-bright": "#faf8ff",
+                    "surface-container-high": "#e9e7ef",
+                    "on-tertiary-fixed-variant": "#773205",
+                    "surface-container-highest": "#e3e1e9",
+                    "inverse-surface": "#2f3036",
+                    "tertiary-fixed-dim": "#ffb691",
+                    "on-tertiary-container": "#f39461",
+                    "surface": "#faf8ff",
+                    "tertiary": "#4b1c00",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#1a1b21",
+                    "tertiary-fixed": "#ffdbcb",
+                    "outline-variant": "#c5c5d3",
+                    "secondary-fixed-dim": "#8bd6b4",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "on-surface-variant": "#444651",
+                    "outline": "#757682",
+                    "on-secondary-fixed-variant": "#00513a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "lg": "48px",
+                    "base": "8px",
+                    "container-max": "1200px",
+                    "sm": "12px",
+                    "xl": "80px",
+                    "md": "24px",
+                    "xs": "4px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "headline-xl": ["Lexend"],
+                    "headline-xl-mobile": ["Lexend"],
+                    "body-md": ["Lexend"],
+                    "label-sm": ["Lexend"],
+                    "body-lg": ["Lexend"],
+                    "headline-lg": ["Lexend"],
+                    "label-md": ["Lexend"],
+                    "headline-md": ["Lexend"]
+            },
+            "fontSize": {
+                    "headline-xl": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                    "headline-xl-mobile": ["30px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                    "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                    "label-sm": ["12px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                    "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                    "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                    "label-md": ["14px", { "lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                    "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .scroll-hide::-webkit-scrollbar { display: none; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(229, 231, 235, 0.5);
+        }
+        .progress-fill { transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
+<!-- Top Navigation Anchor -->
+<header class="w-full top-0 sticky z-50 bg-surface border-b border-outline-variant shadow-sm">
+<div class="flex justify-between items-center px-gutter py-sm max-w-container-max mx-auto">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary">Portal 8</span>
+<nav class="hidden md:flex items-center gap-md ml-lg">
+<a class="text-primary border-b-2 border-primary pb-1 font-label-md" href="#">Current Quiz</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md" href="#">Resources</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden sm:flex items-center bg-surface-container-low px-sm py-xs rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-primary text-[20px] mr-xs">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-label-md w-48" placeholder="Search lessons..." type="text"/>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-label-md text-primary hidden md:block">Logout</span>
+<img class="w-10 h-10 rounded-full border-2 border-primary-fixed-dim object-cover" data-alt="A profile headshot of a cheerful 14-year-old student with a friendly expression, set against a soft blue studio background. The lighting is bright and even, reinforcing the supportive mentor brand identity. The image has a clean, professional finish suited for an educational platform avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6fOtw-EDdGrL-k5sokq9KuzCLyRVJa9L4QhbrZb1RZk4mJ1a0HRvlvKOQ5hEjVPMPfPH9WWJGCp_q5JSPk7BnsnU2Fa2pbkuEVbWmac-j6OzaS8_MOxEDMG8u2JMl6kIKI8DaG-z7WuUHOJaAEAdiE8ANNqjG5aTO2k3nFHCsdcblXnchDKI4bMc74LDhFJPTESNaTcU9b-P6kgdy8FfGngo-xm3ZgA_m7XAgxIIB6IDWT0BBZNLpaYjIWW7wYNqEQRC9Ue8__vf7"/>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-grow max-w-container-max mx-auto w-full px-gutter py-lg">
+<!-- Quiz State Container -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg" id="quiz-state">
+<!-- Sidebar: Tracker & Timer -->
+<aside class="lg:col-span-3 space-y-md order-2 lg:order-1">
+<div class="glass-card rounded-xl p-md shadow-sm border border-outline-variant">
+<div class="flex items-center justify-between mb-sm">
+<h3 class="font-headline-md text-headline-md text-primary">Time Left</h3>
+<span class="material-symbols-outlined text-primary">timer</span>
+</div>
+<div class="text-[32px] font-bold text-on-surface mb-md tabular-nums" id="timer">14:59</div>
+<div class="space-y-sm">
+<div class="flex justify-between text-label-sm text-on-surface-variant">
+<span>Progress</span>
+<span>2 / 5 Questions</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="progress-fill bg-secondary w-[40%] h-full"></div>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-xl p-md border border-outline-variant">
+<h4 class="font-label-md text-on-surface-variant uppercase tracking-wider mb-md">Question Navigator</h4>
+<div class="grid grid-cols-5 gap-xs">
+<button class="w-10 h-10 rounded-lg bg-secondary text-white flex items-center justify-center font-bold">1</button>
+<button class="w-10 h-10 rounded-lg bg-secondary text-white flex items-center justify-center font-bold">2</button>
+<button class="w-10 h-10 rounded-lg bg-surface-container-high text-primary border-2 border-primary flex items-center justify-center font-bold">3</button>
+<button class="w-10 h-10 rounded-lg bg-surface-container-low text-on-surface-variant border border-outline-variant flex items-center justify-center font-bold">4</button>
+<button class="w-10 h-10 rounded-lg bg-surface-container-low text-on-surface-variant border border-outline-variant flex items-center justify-center font-bold">5</button>
+</div>
+</div>
+<div class="p-md rounded-xl bg-primary-fixed text-on-primary-fixed">
+<div class="flex gap-sm items-start">
+<span class="material-symbols-outlined">lightbulb</span>
+<p class="text-label-sm">Don't rush! Read each question carefully. You can always save your draft and return later.</p>
+</div>
+</div>
+</aside>
+<!-- Main Content: Quiz Engine -->
+<section class="lg:col-span-9 space-y-md order-1 lg:order-2">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md mb-base">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-primary">Chapter 4: The Renaissance</h1>
+<p class="text-on-surface-variant">History &amp; Social Studies • 8th Grade</p>
+</div>
+<div class="flex gap-sm">
+<button class="px-md py-sm rounded-lg border border-primary text-primary font-label-md hover:bg-primary-fixed-dim transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px]">save</span>
+                            Save Draft
+                        </button>
+<button class="px-md py-sm rounded-lg bg-primary text-white font-label-md shadow-md hover:opacity-90 transition-opacity flex items-center gap-xs" onclick="submitQuiz()">
+                            Submit Quiz
+                            <span class="material-symbols-outlined text-[20px]">send</span>
+</button>
+</div>
+</div>
+<!-- MCQ Question -->
+<div class="glass-card rounded-xl p-lg space-y-md">
+<div class="flex items-center gap-sm">
+<span class="bg-primary-fixed text-primary px-sm py-xs rounded-lg font-bold">Question 1</span>
+<span class="text-on-surface-variant text-label-md italic">Multiple Choice</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Which Italian city is widely considered the birthplace of the Renaissance?</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md pt-sm">
+<label class="group flex items-center p-md border-2 border-outline-variant rounded-xl cursor-pointer hover:border-primary-fixed-dim hover:bg-surface-container-low transition-all">
+<input class="w-5 h-5 text-primary focus:ring-primary border-outline" name="q1" type="radio"/>
+<span class="ml-md font-body-md">Venice</span>
+</label>
+<label class="group flex items-center p-md border-2 border-primary rounded-xl cursor-pointer bg-primary-fixed-dim transition-all">
+<input checked="" class="w-5 h-5 text-primary focus:ring-primary border-outline" name="q1" type="radio"/>
+<span class="ml-md font-body-md font-bold">Florence</span>
+</label>
+<label class="group flex items-center p-md border-2 border-outline-variant rounded-xl cursor-pointer hover:border-primary-fixed-dim hover:bg-surface-container-low transition-all">
+<input class="w-5 h-5 text-primary focus:ring-primary border-outline" name="q1" type="radio"/>
+<span class="ml-md font-body-md">Rome</span>
+</label>
+<label class="group flex items-center p-md border-2 border-outline-variant rounded-xl cursor-pointer hover:border-primary-fixed-dim hover:bg-surface-container-low transition-all">
+<input class="w-5 h-5 text-primary focus:ring-primary border-outline" name="q1" type="radio"/>
+<span class="ml-md font-body-md">Milan</span>
+</label>
+</div>
+</div>
+<!-- Fill-in-the-Blank Question -->
+<div class="glass-card rounded-xl p-lg space-y-md">
+<div class="flex items-center gap-sm">
+<span class="bg-primary-fixed text-primary px-sm py-xs rounded-lg font-bold">Question 2</span>
+<span class="text-on-surface-variant text-label-md italic">Fill-in-the-Blank</span>
+</div>
+<div class="font-headline-md text-headline-md text-on-surface leading-loose">
+                        The invention of the 
+                        <input class="mx-xs px-base py-xs border-b-2 border-primary focus:border-secondary focus:ring-0 bg-surface-container-low rounded-t-lg w-48 text-center text-primary font-bold transition-all" placeholder="type here..." type="text" value="Printing Press"/> 
+                        by Johannes Gutenberg allowed ideas to spread rapidly across Europe.
+                    </div>
+</div>
+<!-- True/False Question -->
+<div class="glass-card rounded-xl p-lg space-y-md">
+<div class="flex items-center gap-sm">
+<span class="bg-primary-fixed text-primary px-sm py-xs rounded-lg font-bold">Question 3</span>
+<span class="text-on-surface-variant text-label-md italic">True / False</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Leonardo da Vinci was only known for his paintings and had no interest in science or engineering.</h2>
+<div class="flex gap-md pt-base">
+<button class="flex-1 py-lg rounded-xl border-2 border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary hover:bg-primary-fixed-dim transition-all flex flex-col items-center gap-sm">
+<span class="material-symbols-outlined text-[40px]">check_circle</span>
+<span class="font-bold text-headline-md">True</span>
+</button>
+<button class="flex-1 py-lg rounded-xl border-2 border-primary bg-primary text-white shadow-lg flex flex-col items-center gap-sm">
+<span class="material-symbols-outlined text-[40px]" style="font-variation-settings: 'FILL' 1;">cancel</span>
+<span class="font-bold text-headline-md">False</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Scorecard State (Hidden by Default) -->
+<div class="hidden max-w-[800px] mx-auto space-y-lg animate-in fade-in duration-500" id="scorecard-state">
+<!-- Gamified Header -->
+<div class="glass-card rounded-2xl p-xl text-center relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-secondary to-primary"></div>
+<div class="mb-md">
+<span class="material-symbols-outlined text-secondary text-[80px]" style="font-variation-settings: 'FILL' 1;">stars</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-primary mb-xs">Great Job, Alex!</h1>
+<p class="text-body-lg text-on-surface-variant mb-lg">You've mastered the Renaissance basics.</p>
+<div class="inline-flex items-center gap-lg bg-surface-container-low px-xl py-md rounded-2xl border border-outline-variant">
+<div class="text-center">
+<div class="text-headline-xl text-secondary">8 / 10</div>
+<div class="font-label-sm uppercase tracking-widest text-on-surface-variant">Score</div>
+</div>
+<div class="w-[1px] h-12 bg-outline-variant"></div>
+<div class="text-center">
+<div class="text-headline-xl text-primary">80%</div>
+<div class="font-label-sm uppercase tracking-widest text-on-surface-variant">Grade</div>
+</div>
+<div class="w-[1px] h-12 bg-outline-variant"></div>
+<div class="text-center">
+<div class="text-headline-xl text-on-tertiary-fixed-variant">12m</div>
+<div class="font-label-sm uppercase tracking-widest text-on-surface-variant">Time</div>
+</div>
+</div>
+<div class="mt-xl flex justify-center gap-md">
+<button class="px-lg py-md rounded-xl bg-primary text-white font-bold hover:opacity-90 transition-opacity" onclick="location.reload()">Return to Lessons</button>
+<button class="px-lg py-md rounded-xl border-2 border-primary text-primary font-bold hover:bg-primary-fixed-dim transition-colors">Review Full Sheet</button>
+</div>
+</div>
+<!-- Review Sheet -->
+<div class="space-y-md">
+<h3 class="font-headline-md text-headline-md text-primary px-base">Detailed Review</h3>
+<!-- Correct Item -->
+<div class="bg-white rounded-xl border-l-8 border-secondary p-md shadow-sm">
+<div class="flex items-start justify-between">
+<div class="space-y-xs">
+<div class="flex items-center gap-sm text-secondary font-bold">
+<span class="material-symbols-outlined">check_circle</span>
+                                Question 1: Correct
+                            </div>
+<p class="text-body-md font-bold">Which Italian city is widely considered the birthplace of the Renaissance?</p>
+<p class="text-on-surface-variant italic">Your answer: Florence</p>
+</div>
+<span class="text-secondary font-bold">+10 pts</span>
+</div>
+</div>
+<!-- Incorrect Item -->
+<div class="bg-white rounded-xl border-l-8 border-error p-md shadow-sm">
+<div class="flex items-start justify-between">
+<div class="space-y-xs">
+<div class="flex items-center gap-sm text-error font-bold">
+<span class="material-symbols-outlined">error</span>
+                                Question 4: Needs Improvement
+                            </div>
+<p class="text-body-md font-bold">Who painted the ceiling of the Sistine Chapel?</p>
+<p class="text-on-surface-variant italic">Your answer: Leonardo da Vinci</p>
+<div class="mt-md p-sm bg-error-container text-on-error-container rounded-lg text-label-md flex gap-sm">
+<span class="material-symbols-outlined">info</span>
+<div>
+<span class="font-bold">Correction Tip:</span> While Leonardo was a contemporary, <span class="underline">Michelangelo</span> was commissioned by Pope Julius II to paint the Sistine Chapel ceiling between 1508 and 1512.
+                                </div>
+</div>
+</div>
+<span class="text-error font-bold">+0 pts</span>
+</div>
+</div>
+<!-- Correct Item 2 -->
+<div class="bg-white rounded-xl border-l-8 border-secondary p-md shadow-sm">
+<div class="flex items-start justify-between">
+<div class="space-y-xs">
+<div class="flex items-center gap-sm text-secondary font-bold">
+<span class="material-symbols-outlined">check_circle</span>
+                                Question 2: Correct
+                            </div>
+<p class="text-body-md font-bold">The invention of the Printing Press by Johannes Gutenberg...</p>
+<p class="text-on-surface-variant italic">Your answer: Printing Press</p>
+</div>
+<span class="text-secondary font-bold">+10 pts</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Anchor -->
+<footer class="w-full py-md mt-xl bg-surface-container-low border-t border-outline-variant">
+<div class="flex flex-col md:flex-row justify-between items-center px-gutter max-w-container-max mx-auto gap-md">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md text-primary font-bold">Portal 8</span>
+<p class="font-label-sm text-on-surface-variant">© 2024 Portal 8 Educational Platform</p>
+</div>
+<div class="flex gap-md">
+<a class="text-on-surface-variant hover:text-primary transition-opacity font-label-sm" href="#">Help Center</a>
+<a class="text-on-surface-variant hover:text-primary transition-opacity font-label-sm" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-opacity font-label-sm" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-opacity font-label-sm" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+<script>
+        function submitQuiz() {
+            const quiz = document.getElementById('quiz-state');
+            const scorecard = document.getElementById('scorecard-state');
+            
+            quiz.classList.add('opacity-0', 'transition-all', 'duration-500');
+            setTimeout(() => {
+                quiz.classList.add('hidden');
+                scorecard.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 500);
+        }
+
+        // Simple Timer logic
+        let time = 899; // 14:59
+        const timerEl = document.getElementById('timer');
+        
+        setInterval(() => {
+            if (time > 0) {
+                time--;
+                const mins = Math.floor(time / 60);
+                const secs = time % 60;
+                timerEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+                
+                if (time < 300) {
+                    timerEl.classList.add('text-error');
+                }
+            }
+        }, 1000);
+
+        // Particle effect for gamified scorecard
+        function createConfetti() {
+            const container = document.getElementById('scorecard-state');
+            if (container.classList.contains('hidden')) return;
+            
+            for(let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.backgroundColor = ['#b6c4ff', '#1b6b4f', '#4059aa', '#a6f2cf'][Math.floor(Math.random() * 4)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.zIndex = '100';
+                confetti.style.borderRadius = '2px';
+                document.body.appendChild(confetti);
+
+                const animation = confetti.animate([
+                    { transform: 'translateY(0) rotate(0)', opacity: 1 },
+                    { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 3000 + 2000,
+                    easing: 'cubic-bezier(0, .9, .57, 1)'
+                });
+
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+
+        // Trigger confetti when scorecard appears
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') {
+                    if (!document.getElementById('scorecard-state').classList.contains('hidden')) {
+                        createConfetti();
+                    }
+                }
+            });
+        });
+        observer.observe(document.getElementById('scorecard-state'), { attributes: true });
+    </script>
+</body></html>

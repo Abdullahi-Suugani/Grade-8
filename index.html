@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grade 8 Learning Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    rel="stylesheet">
+  <style>
+    :root {
+      --surface: #faf8ff;
+      --surface-low: #f4f3fa;
+      --surface-mid: #eeedf4;
+      --surface-high: #e3e1e9;
+      --white: #ffffff;
+      --ink: #1a1b21;
+      --muted: #444651;
+      --outline: #c5c5d3;
+      --primary: #00236f;
+      --primary-2: #1e3a8a;
+      --primary-soft: #dce1ff;
+      --mint: #a6f2cf;
+      --green: #1b6b4f;
+      --amber: #f8c66a;
+      --coral: #ba1a1a;
+      --coral-soft: #ffdad6;
+      --shadow: 0 4px 20px rgba(30, 58, 138, .05);
+      --shadow-strong: 0 10px 30px rgba(30, 58, 138, .10);
+      font-family: Lexend, system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      overflow-x: hidden;
+    }
+
+    body {
+      margin: 0;
+      background: var(--surface);
+      color: var(--ink);
+      min-width: 320px;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .icon {
+      font-family: "Material Symbols Outlined";
+      font-weight: normal;
+      font-style: normal;
+      font-size: 22px;
+      line-height: 1;
+      display: inline-flex;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .app {
+      min-height: 100vh;
+    }
+
+    .auth-shell {
+      height: 100dvh;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(320px, 35%) 1fr;
+    }
+
+    .brand-side {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 32px;
+      padding: 40px 32px;
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    }
+
+    .brand-side::before {
+      content: "school";
+      position: absolute;
+      right: -64px;
+      top: -72px;
+      font-family: "Material Symbols Outlined";
+      font-size: 300px;
+      opacity: .08;
+    }
+
+    .logo-lockup {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      width: fit-content;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, .18);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .10);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, .12);
+    }
+
+    .logo-mark {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--mint);
+      color: var(--primary);
+    }
+
+    .brand-name {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .brand-copy {
+      position: relative;
+      z-index: 1;
+      max-width: 430px;
+    }
+
+    .brand-copy h1 {
+      margin: 0 0 24px;
+      color: var(--primary-soft);
+      font-size: clamp(34px, 4vw, 52px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .brand-copy p {
+      margin: 0;
+      padding: 24px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .06);
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .brand-art {
+      position: absolute;
+      left: -70px;
+      bottom: -90px;
+      width: 420px;
+      height: 420px;
+      opacity: .42;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 28px;
+      background: rgba(166, 242, 207, .52);
+      transform: rotate(18deg);
+    }
+
+    .orb.one {
+      width: 150px;
+      height: 150px;
+      left: 75px;
+      top: 80px;
+    }
+
+    .orb.two {
+      width: 95px;
+      height: 95px;
+      left: 230px;
+      top: 190px;
+      background: rgba(182, 196, 255, .62);
+    }
+
+    .orb.three {
+      width: 72px;
+      height: 72px;
+      left: 132px;
+      top: 260px;
+      background: rgba(255, 255, 255, .55);
+    }
+
+    .auth-panel {
+      position: relative;
+      display: grid;
+      place-items: center;
+      padding: 24px 32px;
+      background: var(--surface-low);
+    }
+
+    .auth-card {
+      width: min(100%, 480px);
+      padding: 36px;
+      border: 1px solid var(--outline);
+      border-radius: 16px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    .auth-card h2 {
+      margin: 0 0 4px;
+      color: var(--primary);
+      font-size: 32px;
+      line-height: 1.3;
+    }
+
+    .auth-card p {
+      margin: 0 0 24px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .field-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    label,
+    .label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap .icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #757682;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 2px solid var(--outline);
+      border-radius: 8px;
+      background: white;
+      color: var(--ink);
+      padding: 14px 14px;
+      outline: none;
+      transition: border .18s, box-shadow .18s, background .18s;
+    }
+
+    .input-wrap input {
+      padding-left: 44px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(166, 242, 207, .42);
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding: 6px;
+      border-radius: 12px;
+      background: var(--surface-low);
+    }
+
+    .tab {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--muted);
+      background: transparent;
+      font-weight: 700;
+    }
+
+    .tab.active {
+      color: white;
+      background: var(--primary);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 18px;
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+      transition: transform .18s, box-shadow .18s, opacity .18s, background .18s;
+    }
+
+    .btn:hover {
+      box-shadow: var(--shadow-strong);
+    }
+
+    .btn:active {
+      transform: scale(.98);
+    }
+
+    .btn.secondary {
+      background: var(--mint);
+      color: #002115;
+    }
+
+    .btn.ghost {
+      border: 1px solid var(--primary);
+      background: white;
+      color: var(--primary);
+    }
+
+    .btn.warn {
+      background: var(--coral);
+    }
+
+    .btn.full {
+      width: 100%;
+      min-height: 58px;
+      font-size: 22px;
+    }
+
+    .btn:disabled {
+      opacity: .48;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .auth-cta {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .pill-note {
+      display: inline-flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 12px 20px;
+      border: 1px solid rgba(27, 107, 79, .18);
+      border-radius: 999px;
+      background: rgba(166, 242, 207, .28);
+      font-size: 14px;
+    }
+
+    .text-link {
+      border: 0;
+      background: transparent;
+      color: var(--green);
+      font-weight: 700;
+      padding: 0;
+    }
+
+    .error {
+      margin: -4px 0 18px;
+      padding: 12px;
+      border-radius: 8px;
+      background: var(--coral-soft);
+      color: #93000a;
+      font-size: 14px;
+    }
+
+    .fine-print {
+      position: absolute;
+      bottom: 24px;
+      color: #757682;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--outline);
+      background: rgba(250, 248, 255, .94);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 2px 12px rgba(30, 58, 138, .04);
+    }
+
+    .topbar-inner {
+      max-width: 1200px;
+      height: 76px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand-mini {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 0;
+      background: transparent;
+      color: var(--primary);
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border: 2px solid var(--primary-soft);
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: var(--mint);
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 48px;
+      align-items: center;
+      margin-bottom: 48px;
+      padding: 48px;
+      border-radius: 16px;
+      background: var(--primary-2);
+      color: white;
+      overflow: hidden;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin: 14px 0 24px;
+      color: var(--primary-soft);
+      font-size: 18px;
+      line-height: 1.6;
+      max-width: 680px;
+    }
+
+    .hero-visual {
+      height: 240px;
+      position: relative;
+    }
+
+    .tile {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, .12);
+      border: 1px solid rgba(255, 255, 255, .18);
+      color: var(--mint);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, .16);
+    }
+
+    .tile.a {
+      width: 118px;
+      height: 118px;
+      left: 26px;
+      top: 22px;
+      transform: rotate(-10deg);
+    }
+
+    .tile.b {
+      width: 92px;
+      height: 92px;
+      left: 158px;
+      top: 70px;
+      transform: rotate(14deg);
+      color: #ffdbcb;
+    }
+
+    .tile.c {
+      width: 74px;
+      height: 74px;
+      left: 82px;
+      top: 152px;
+      transform: rotate(8deg);
+      color: var(--primary-soft);
+    }
+
+    .grid {
+      display: grid;
+      gap: 24px;
+    }
+
+    .subjects {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 48px;
+    }
+
+    .card {
+      border: 1px solid var(--outline);
+      border-radius: 16px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    .subject-card {
+      padding: 24px;
+      min-height: 210px;
+      text-align: left;
+      transition: transform .18s, box-shadow .18s, border .18s;
+    }
+
+    .subject-card:hover,
+    .chapter-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-strong);
+      border-color: var(--primary);
+    }
+
+    .subject-card.active {
+      border: 2px solid var(--primary);
+      box-shadow: 0 0 0 4px rgba(0, 35, 111, .05), var(--shadow);
+    }
+
+    .subject-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 24px;
+    }
+
+    .subject-card h3 {
+      margin: 0 0 16px;
+      font-size: 22px;
+      color: var(--ink);
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .progress {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-mid);
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--green);
+      transition: width .3s;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      color: var(--primary);
+      font-size: 24px;
+    }
+
+    .two-col {
+      grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .quest {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px;
+      border: 1px solid var(--outline);
+      border-radius: 12px;
+      background: white;
+    }
+
+    .quest+.quest {
+      margin-top: 14px;
+    }
+
+    .quest-left {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .badge-icon {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: rgba(27, 107, 79, .10);
+      color: var(--green);
+    }
+
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: rgba(0, 0, 0, .40);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+    }
+
+    .drawer-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer {
+      position: fixed;
+      z-index: 50;
+      right: 0;
+      top: 0;
+      width: min(100%, 450px);
+      height: 100%;
+      overflow: auto;
+      transform: translateX(100%);
+      transition: transform .32s;
+      background: var(--surface);
+      box-shadow: -18px 0 50px rgba(0, 0, 0, .18);
+      padding: 24px;
+    }
+
+    .drawer.open {
+      transform: translateX(0);
+    }
+
+    .chapter-card {
+      width: 100%;
+      padding: 24px;
+      text-align: left;
+      margin-bottom: 16px;
+      transition: transform .18s, box-shadow .18s, border .18s;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 4px 9px;
+      background: var(--mint);
+      color: #002115;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .study-layout {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .breadcrumb {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 28px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .center-title {
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto 32px;
+    }
+
+    .center-title h1 {
+      margin: 0 0 8px;
+      color: var(--primary);
+      font-size: clamp(30px, 5vw, 40px);
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .center-title p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .flash-wrap {
+      perspective: 1000px;
+      height: 410px;
+    }
+
+    .flash-card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform .55s;
+      border: 0;
+      background: transparent;
+    }
+
+    .flash-card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 48px;
+      border: 2px solid var(--outline);
+      border-radius: 16px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    .face.back {
+      transform: rotateY(180deg);
+      border-color: var(--green);
+      background: var(--surface-low);
+    }
+
+    .face h2 {
+      margin: 16px 0;
+      color: var(--primary);
+      font-size: clamp(24px, 4vw, 32px);
+      line-height: 1.3;
+      letter-spacing: 0;
+    }
+
+    .face p {
+      max-width: 620px;
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.55;
+    }
+
+    .card-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--outline);
+    }
+
+    .dot.active {
+      background: var(--primary);
+    }
+
+    .unlock-panel {
+      margin-top: 48px;
+      padding: 32px;
+      border: 2px dashed rgba(0, 35, 111, .20);
+      border-radius: 16px;
+      background: var(--surface-high);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .quiz-layout {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 48px;
+      align-items: start;
+    }
+
+    .quiz-question {
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .quiz-question h2 {
+      margin: 18px 0 20px;
+      font-size: 24px;
+      line-height: 1.4;
+      letter-spacing: 0;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px;
+      border: 2px solid var(--outline);
+      border-radius: 16px;
+      background: white;
+      cursor: pointer;
+      transition: border .18s, background .18s;
+    }
+
+    .option:has(input:checked) {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      font-weight: 700;
+    }
+
+    .tf-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .tf-btn {
+      min-height: 110px;
+      border: 2px solid var(--outline);
+      border-radius: 16px;
+      background: white;
+      color: var(--muted);
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .tf-btn.active {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .scorecard {
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    .score-hero {
+      position: relative;
+      overflow: hidden;
+      padding: 48px;
+      text-align: center;
+    }
+
+    .score-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 8px;
+      background: linear-gradient(90deg, var(--green), var(--primary));
+    }
+
+    .score-grid {
+      display: inline-grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      margin: 28px 0;
+      border: 1px solid var(--outline);
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--surface-low);
+    }
+
+    .score-grid div {
+      min-width: 150px;
+      padding: 20px 28px;
+      border-right: 1px solid var(--outline);
+    }
+
+    .score-grid div:last-child {
+      border-right: 0;
+    }
+
+    .big-num {
+      display: block;
+      color: var(--primary);
+      font-size: 40px;
+      font-weight: 800;
+    }
+
+    .review {
+      margin-top: 24px;
+      padding: 24px;
+      border-left: 8px solid var(--green);
+    }
+
+    .review.bad {
+      border-left-color: var(--coral);
+    }
+
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .admin-nav {
+      padding: 16px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .admin-nav button {
+      justify-content: flex-start;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+      padding: 14px 10px;
+      border-bottom: 1px solid var(--outline);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .span-2 {
+      grid-column: 1 / -1;
+    }
+
+    footer {
+      padding: 24px;
+      border-top: 1px solid var(--outline);
+      background: var(--surface-low);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 920px) {
+
+      .auth-shell,
+      .hero,
+      .study-layout,
+      .quiz-layout,
+      .admin-layout,
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .brand-side {
+        min-height: 460px;
+      }
+
+      .subjects {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .hero-visual {
+        display: none;
+      }
+
+      .fine-print {
+        position: static;
+        margin-top: 30px;
+      }
+    }
+
+    @media (max-width: 620px) {
+
+      .auth-card,
+      .hero,
+      .score-hero,
+      .quiz-question {
+        padding: 24px;
+      }
+
+      .auth-panel,
+      .brand-side,
+      .page {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .subjects,
+      .options,
+      .tf-grid,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar-inner {
+        padding: 0 16px;
+      }
+
+      .nav-actions .muted {
+        display: none;
+      }
+
+      .unlock-panel,
+      .card-controls,
+      .section-head {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .score-grid {
+        display: grid;
+        width: 100%;
+        grid-template-columns: 1fr;
+      }
+
+      .score-grid div {
+        border-right: 0;
+        border-bottom: 1px solid var(--outline);
+      }
+
+      .score-grid div:last-child {
+        border-bottom: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app" class="app"></div>
+
+  <script>
+    const STORAGE_KEY = "portal8-state-v1";
+    const state = loadState();
+    let session = JSON.parse(localStorage.getItem("portal8-session") || "null");
+    let view = session ? (session.role === "admin" ? "admin" : "dashboard") : "auth";
+    let authMode = "login";
+    let selectedSubjectId = state.sections[0].id;
+    let selectedChapterId = state.chapters[0].id;
+    let flashIndex = 0;
+    let flashSeen = new Set();
+    let quizAnswers = {};
+    let quizSubmitted = null;
+    let adminTab = "content";
+
+    function defaultState() {
+      return {
+        users: [
+          { id: uid(), name: "Alex", passwordHash: "d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791", role: "student", section: "8A" },
+          { id: uid(), name: "Teacher", passwordHash: "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", role: "admin", section: "Faculty" }
+        ],
+        attempts: [],
+        sections: [
+          { id: "math", name: "Mathematics", description: "Expressions, equations, geometry, and data skills.", icon: "calculate", color: "#f8c66a" },
+          { id: "science", name: "Science", description: "Cells, reactions, forces, earth systems, and lab thinking.", icon: "science", color: "#a6f2cf" },
+          { id: "history", name: "History", description: "World events, civic ideas, and historical evidence.", icon: "history_edu", color: "#ffdbcb" },
+          { id: "english", name: "English Language Arts", description: "Reading analysis, grammar, writing, and vocabulary.", icon: "auto_stories", color: "#dce1ff" }
+        ],
+        chapters: [
+          {
+            id: "sci-cells", sectionId: "science", title: "Chapter 1: Cell Biology", summary: "Explore cells, organelles, and the systems that keep organisms alive.",
+            qa: [
+              ["What is a cell?", "A cell is the smallest unit of life that can perform all basic life functions."],
+              ["What does the nucleus do?", "The nucleus stores DNA and controls many activities inside the cell."],
+              ["What is the job of mitochondria?", "Mitochondria release usable energy from food for the cell."]
+            ],
+            quiz: [
+              { type: "mcq", question: "Which organelle is often called the powerhouse of the cell?", options: ["Nucleus", "Mitochondria", "Ribosome", "Cell wall"], answer: "Mitochondria" },
+              { type: "fill", question: "The ____ controls many activities inside the cell.", answer: "nucleus" },
+              { type: "tf", question: "Plant cells have a cell wall.", answer: "true" }
+            ]
+          },
+          {
+            id: "sci-reactions", sectionId: "science", title: "Chapter 2: Chemical Reactions", summary: "Discover atoms, bonds, conservation of mass, and reaction signs.",
+            qa: [
+              ["What is a chemical reaction?", "A process where substances rearrange atoms to form new substances."],
+              ["What is a covalent bond?", "A chemical bond formed when atoms share electron pairs."],
+              ["Define an exothermic reaction.", "An exothermic reaction releases energy, often as heat or light."],
+              ["What does conservation of mass mean?", "Matter is not created or destroyed during a chemical reaction."],
+              ["Name one sign of a chemical reaction.", "Color change, gas production, temperature change, light, or a new solid can be signs."]
+            ],
+            quiz: [
+              { type: "mcq", question: "What happens in a covalent bond?", options: ["Atoms share electrons", "Atoms become magnets", "Atoms disappear", "Atoms stop moving"], answer: "Atoms share electrons" },
+              { type: "fill", question: "A reaction that releases heat is called ____.", answer: "exothermic" },
+              { type: "tf", question: "Mass is conserved during a chemical reaction.", answer: "true" },
+              { type: "mcq", question: "Which is evidence of a chemical reaction?", options: ["Paper being cut", "Ice melting", "Gas bubbles forming", "Sand being poured"], answer: "Gas bubbles forming" }
+            ]
+          },
+          {
+            id: "math-eq", sectionId: "math", title: "Chapter 1: Linear Equations", summary: "Solve one-step, two-step, and multi-step equations confidently.",
+            qa: [
+              ["What is an equation?", "A mathematical statement showing two expressions are equal."],
+              ["What does inverse operation mean?", "An operation that undoes another operation, such as subtraction undoing addition."],
+              ["How do you solve 2x = 14?", "Divide both sides by 2, so x = 7."]
+            ],
+            quiz: [
+              { type: "mcq", question: "Solve: x + 9 = 15", options: ["4", "6", "9", "24"], answer: "6" },
+              { type: "fill", question: "Solve: 3x = 21. x = ____.", answer: "7" },
+              { type: "tf", question: "You can add the same number to both sides of an equation.", answer: "true" }
+            ]
+          },
+          {
+            id: "hist-ren", sectionId: "history", title: "Chapter 4: The Renaissance", summary: "Study humanism, art, invention, and the spread of new ideas.",
+            qa: [
+              ["Which city is considered a Renaissance birthplace?", "Florence is widely considered the birthplace of the Renaissance."],
+              ["Who invented the printing press in Europe?", "Johannes Gutenberg developed movable type printing in Europe."],
+              ["Who painted the Sistine Chapel ceiling?", "Michelangelo painted the Sistine Chapel ceiling."]
+            ],
+            quiz: [
+              { type: "mcq", question: "Which Italian city is widely considered the birthplace of the Renaissance?", options: ["Venice", "Florence", "Rome", "Milan"], answer: "Florence" },
+              { type: "fill", question: "The invention of the ____ helped ideas spread rapidly across Europe.", answer: "printing press" },
+              { type: "tf", question: "Leonardo da Vinci was interested in science and engineering.", answer: "true" },
+              { type: "mcq", question: "Who painted the Sistine Chapel ceiling?", options: ["Michelangelo", "Leonardo da Vinci", "Raphael", "Donatello"], answer: "Michelangelo" }
+            ]
+          },
+          {
+            id: "ela-theme", sectionId: "english", title: "Chapter 3: Theme and Evidence", summary: "Find central ideas and support them with strong text evidence.",
+            qa: [
+              ["What is theme?", "Theme is the deeper message or lesson a text communicates."],
+              ["What is text evidence?", "Words, details, or examples from a text that support an idea."],
+              ["What is inference?", "A conclusion based on evidence and reasoning."]
+            ],
+            quiz: [
+              { type: "mcq", question: "A theme is best described as...", options: ["A character name", "A deeper message", "The page count", "A punctuation mark"], answer: "A deeper message" },
+              { type: "fill", question: "A conclusion based on clues and reasoning is an ____.", answer: "inference" },
+              { type: "tf", question: "Text evidence should come from the passage.", answer: "true" }
+            ]
+          }
+        ]
+      };
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+      const seeded = defaultState();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
+      return seeded;
+    }
+
+    function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    function uid() { return Math.random().toString(36).slice(2, 10); }
+    function $(selector) { return document.querySelector(selector); }
+    async function hashPassword(password) {
+      const data = new TextEncoder().encode(password);
+      const digest = await crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2, "0")).join("");
+    }
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+    }
+    function currentUser() { return state.users.find(user => user.id === session?.id); }
+    function chaptersFor(sectionId) { return state.chapters.filter(chapter => chapter.sectionId === sectionId); }
+    function chapterById(id) { return state.chapters.find(chapter => chapter.id === id); }
+    function sectionById(id) { return state.sections.find(section => section.id === id); }
+    function userAttempts() { return state.attempts.filter(attempt => attempt.userId === session?.id); }
+
+    function setView(next) {
+      view = next;
+      flashIndex = 0;
+      flashSeen = new Set();
+      quizAnswers = {};
+      quizSubmitted = null;
+      render();
+    }
+
+    function appShell(content) {
+      const user = currentUser();
+      return `
+        <header class="topbar">
+          <div class="topbar-inner">
+            <button class="brand-mini" onclick="setView('${user?.role === "admin" ? "admin" : "dashboard"}')">
+              <span class="icon">school</span><span>Grade 8</span>
+            </button>
+            <div class="nav-actions">
+              <span class="muted">Hi, ${escapeHtml(user?.name || "Student")}</span>
+              <div class="avatar">${escapeHtml((user?.name || "P").slice(0, 1).toUpperCase())}</div>
+              <button class="btn ghost" onclick="logout()"><span class="icon">logout</span><span>Logout</span></button>
+            </div>
+          </div>
+        </header>
+        ${content}
+        <footer><div class="topbar-inner" style="height:auto"><strong>Grade 8</strong><span>Help Center / Privacy / Contact Support</span></div></footer>
+      `;
+    }
+
+    function renderAuth(error = "") {
+      const isSignup = authMode === "signup";
+      return `
+        <main class="auth-shell">
+          <section class="brand-side">
+            <div class="logo-lockup">
+              <div class="logo-mark"><span class="icon">terminal</span></div>
+              <span class="brand-name">Grade 8</span>
+            </div>
+            <div class="brand-copy">
+              <h1>Your Academic<br>Journey Starts Here.</h1>
+            </div>
+            <div class="brand-art"><span class="orb one"></span><span class="orb two"></span><span class="orb three"></span></div>
+          </section>
+          <section class="auth-panel">
+            <div>
+              <div class="auth-card">
+                <div class="auth-tabs">
+                  <button class="tab ${!isSignup ? "active" : ""}" onclick="authMode='login';render()">Log In</button>
+                  <button class="tab ${isSignup ? "active" : ""}" onclick="authMode='signup';render()">Sign Up</button>
+                </div>
+                <h2>${isSignup ? "Create Account" : "Log In"}</h2>
+                <p>${isSignup ? "Register as a student and start learning." : "Welcome back! Please enter your details."}</p>
+                ${error ? `<div class="error">${escapeHtml(error)}</div>` : ""}
+                <form onsubmit="${isSignup ? "signup" : "login"}(event)">
+                  <div class="field">
+                    <label for="name">Name</label>
+                    <div class="input-wrap"><span class="icon">person</span><input id="name" required autocomplete="username" placeholder="e.g. Alex"></div>
+                  </div>
+                  <div class="field">
+                    <div class="field-row"><label for="password">Password</label></div>
+                    <div class="input-wrap"><span class="icon">lock</span><input id="password" required type="password" autocomplete="current-password" placeholder="password"></div>
+                  </div>
+                  ${isSignup ? `
+                  <div class="field">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="input-wrap"><span class="icon">lock_reset</span><input id="confirmPassword" required type="password" autocomplete="new-password" placeholder="confirm password"></div>
+                  </div>` : ""}
+                  <button class="btn full" type="submit">${isSignup ? "Sign Up" : "Log In"} <span class="icon">arrow_forward</span></button>
+                </form>
+              </div>
+              <div class="auth-cta"><div class="pill-note">${isSignup ? "Already have an account?" : "If you don't have an account, please"} <button class="text-link" onclick="authMode='${isSignup ? "login" : "signup"}';render()">${isSignup ? "log in." : "sign up."}</button></div></div>
+            </div>
+          </section>
+        </main>
+      `;
+    }
+
+    function renderDashboard() {
+      const attempts = userAttempts();
+      const completed = new Set(attempts.map(attempt => attempt.chapterId));
+      const avg = attempts.length ? Math.round(attempts.reduce((sum, attempt) => sum + attempt.percent, 0) / attempts.length) : 0;
+      const subjectCards = state.sections.map(section => {
+        const chapters = chaptersFor(section.id);
+        const done = chapters.filter(chapter => completed.has(chapter.id)).length;
+        const pct = chapters.length ? Math.round((done / chapters.length) * 100) : 0;
+        return `
+          <button class="card subject-card ${section.id === selectedSubjectId ? "active" : ""}" onclick="openDrawer('${section.id}')">
+            <div class="subject-icon" style="background:${section.color}; color:var(--primary)"><span class="icon">${section.icon}</span></div>
+            <h3>${escapeHtml(section.name)}</h3>
+            <div class="progress-meta"><span>${done}/${chapters.length} Chapters Complete</span><span>${pct}%</span></div>
+            <div class="progress"><span style="width:${pct}%"></span></div>
+          </button>
+        `;
+      }).join("");
+
+      return appShell(`
+        <main class="page">
+          <section class="hero">
+            <div>
+              <h1>Welcome to your Learning Portal!</h1>
+              <p>Choose a subject, read the chapter Q&A cards, then unlock the self-test quiz with instant scoring and corrections.</p>
+              <button class="btn secondary" onclick="continueLastLesson()"><span class="icon">rocket_launch</span>Continue Last Lesson</button>
+            </div>
+            <div class="hero-visual"><div class="tile a"><span class="icon" style="font-size:54px">science</span></div><div class="tile b"><span class="icon" style="font-size:44px">calculate</span></div><div class="tile c"><span class="icon" style="font-size:36px">auto_stories</span></div></div>
+          </section>
+          <section class="grid subjects">${subjectCards}</section>
+          <div class="section-head"><h2>Recent Activity & Quests</h2><button class="text-link" onclick="setView('profile')">View Profile</button></div>
+          <section class="grid two-col">
+            <div class="card panel">
+              <div class="quest"><div class="quest-left"><div class="badge-icon"><span class="icon">verified</span></div><div><strong>Complete one chapter quiz</strong><br><span class="muted">Reward: 50 XP</span></div></div><span class="muted">${attempts.length ? "Complete" : "0/1 Complete"}</span></div>
+              <div class="quest"><div class="quest-left"><div class="badge-icon" style="background:#fff1ca;color:#775100"><span class="icon">menu_book</span></div><div><strong>Read all flashcards in a chapter</strong><br><span class="muted">Reward: 20 XP</span></div></div><button class="btn" onclick="continueLastLesson()">Start</button></div>
+            </div>
+            <div class="card panel">
+              <span class="label">Learning Streak</span>
+              <div style="display:flex;justify-content:space-between;align-items:end;margin:16px 0"><span style="font-size:52px;font-weight:800;color:var(--primary)">12</span><span class="muted">Days in a row</span></div>
+              <div class="progress"><span style="width:${Math.max(avg, 18)}%"></span></div>
+              <p class="muted">Average quiz score: ${avg}%</p>
+            </div>
+          </section>
+        </main>
+        ${renderDrawer()}
+      `);
+    }
+
+    function renderDrawer() {
+      const section = sectionById(selectedSubjectId);
+      return `
+        <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
+        <aside id="drawer" class="drawer">
+          <div class="section-head"><div><h2>${escapeHtml(section.name)} Chapters</h2><span class="muted">Select a topic to start studying</span></div><button class="btn ghost" onclick="closeDrawer()"><span class="icon">close</span></button></div>
+          ${chaptersFor(section.id).map(chapter => `
+            <button class="card chapter-card" onclick="startChapter('${chapter.id}')">
+              <div class="section-head" style="margin-bottom:10px"><h2 style="font-size:22px;color:var(--ink)">${escapeHtml(chapter.title)}</h2><span class="tag">Ready to Study</span></div>
+              <p class="muted">${escapeHtml(chapter.summary)}</p>
+              <strong style="color:var(--primary);display:flex;gap:8px;align-items:center">Begin Lesson <span class="icon">arrow_forward</span></strong>
+            </button>
+          `).join("")}
+        </aside>
+      `;
+    }
+
+    function renderStudy() {
+      const chapter = chapterById(selectedChapterId);
+      const section = sectionById(chapter.sectionId);
+      const card = chapter.qa[flashIndex];
+      flashSeen.add(flashIndex);
+      const pct = Math.round((flashSeen.size / chapter.qa.length) * 100);
+      const unlocked = flashSeen.size === chapter.qa.length;
+      return appShell(`
+        <main class="page">
+          <div class="breadcrumb"><button class="text-link" onclick="setView('dashboard')"><span class="icon">arrow_back</span>Back</button><span>${escapeHtml(section.name)}</span><span class="icon">chevron_right</span><span>${escapeHtml(chapter.title)}</span><span class="icon">chevron_right</span><strong>Q&A Study Mode</strong></div>
+          <div class="center-title"><h1>${escapeHtml(chapter.title.replace(/^Chapter \\d+: /, ""))}</h1><p>${escapeHtml(chapter.summary)} Click the card to reveal the answer.</p></div>
+          <section class="study-layout">
+            <aside class="grid">
+              <div class="card panel"><span class="label">Session Progress</span><div style="margin:12px 0"><span style="font-size:32px;font-weight:800;color:var(--primary)">${flashIndex + 1}</span><span class="muted"> / ${chapter.qa.length}</span></div><div class="progress"><span style="width:${pct}%"></span></div></div>
+              <div class="card panel" style="background:var(--mint);color:#002115"><strong><span class="icon">bolt</span> Study Streak: 5 Days</strong></div>
+            </aside>
+            <section>
+              <div class="flash-wrap">
+                <button id="flashcard" class="flash-card" onclick="this.classList.toggle('flipped')">
+                  <div class="face"><span class="tag">Question ${flashIndex + 1} of ${chapter.qa.length}</span><h2>${escapeHtml(card[0])}</h2><span class="muted">Click card to reveal answer</span></div>
+                  <div class="face back"><span class="tag">The Answer</span><p>${escapeHtml(card[1])}</p></div>
+                </button>
+              </div>
+              <div class="card-controls">
+                <button class="btn ghost" ${flashIndex === 0 ? "disabled" : ""} onclick="moveFlash(-1)"><span class="icon">chevron_left</span>Previous</button>
+                <div class="dots">${chapter.qa.map((_, index) => `<span class="dot ${index === flashIndex ? "active" : ""}"></span>`).join("")}</div>
+                <button class="btn secondary" ${flashIndex === chapter.qa.length - 1 ? "disabled" : ""} onclick="moveFlash(1)">Next Question<span class="icon">chevron_right</span></button>
+              </div>
+            </section>
+          </section>
+          <section class="unlock-panel">
+            <div class="quest-left"><div class="logo-mark"><span class="icon">${unlocked ? "lock_open" : "lock"}</span></div><div><h2 style="margin:0;color:var(--primary)">Ready for the Quiz?</h2><span class="muted">${unlocked ? "All Q&A cards reviewed. The chapter quiz is unlocked." : `Review all ${chapter.qa.length} cards to unlock the quiz.`}</span></div></div>
+            <button class="btn" ${unlocked ? "" : "disabled"} onclick="startQuiz()">Start Chapter Quiz</button>
+          </section>
+        </main>
+      `);
+    }
+
+    function renderQuiz() {
+      const chapter = chapterById(selectedChapterId);
+      if (quizSubmitted) return appShell(renderScorecard(chapter, quizSubmitted));
+      return appShell(`
+        <main class="page">
+          <section class="quiz-layout">
+            <aside class="grid">
+              <div class="card panel"><div class="section-head"><h2>Quiz</h2><span class="icon" style="color:var(--primary)">timer</span></div><div style="font-size:32px;font-weight:800">15:00</div><div class="progress" style="margin-top:16px"><span style="width:${answerProgress(chapter)}%"></span></div><p class="muted">${Object.keys(quizAnswers).length} / ${chapter.quiz.length} Questions answered</p></div>
+              <div class="card panel"><span class="label">Question Navigator</span><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:14px">${chapter.quiz.map((q, i) => `<button class="btn ${quizAnswers[i] ? "secondary" : "ghost"}" style="padding:8px;min-height:40px">${i + 1}</button>`).join("")}</div></div>
+              <div class="card panel" style="background:var(--primary-soft);color:var(--primary)"><strong><span class="icon">lightbulb</span> Read each question carefully before submitting.</strong></div>
+            </aside>
+            <section>
+              <div class="section-head"><div><h1 style="margin:0;color:var(--primary)">${escapeHtml(chapter.title)}</h1><span class="muted">${escapeHtml(sectionById(chapter.sectionId).name)} / 8th Grade</span></div><button class="btn" onclick="submitQuiz()">Submit Quiz <span class="icon">send</span></button></div>
+              ${chapter.quiz.map((question, index) => renderQuestion(question, index)).join("")}
+            </section>
+          </section>
+        </main>
+      `);
+    }
+
+    function renderQuestion(question, index) {
+      if (question.type === "mcq") {
+        return `<div class="card quiz-question"><span class="tag">Question ${index + 1}</span> <span class="muted">Multiple Choice</span><h2>${escapeHtml(question.question)}</h2><div class="options">${question.options.map(option => `<label class="option"><input type="radio" name="q${index}" ${quizAnswers[index] === option ? "checked" : ""} onchange='setAnswer(${index}, ${JSON.stringify(option)})'><span>${escapeHtml(option)}</span></label>`).join("")}</div></div>`;
+      }
+      if (question.type === "fill") {
+        return `<div class="card quiz-question"><span class="tag">Question ${index + 1}</span> <span class="muted">Fill-in-the-Blank</span><h2>${escapeHtml(question.question)}</h2><input value="${escapeHtml(quizAnswers[index] || "")}" oninput="setAnswer(${index}, this.value)" placeholder="type here..."></div>`;
+      }
+      return `<div class="card quiz-question"><span class="tag">Question ${index + 1}</span> <span class="muted">True / False</span><h2>${escapeHtml(question.question)}</h2><div class="tf-grid"><button class="tf-btn ${quizAnswers[index] === "true" ? "active" : ""}" onclick="setAnswer(${index}, 'true')"><span class="icon" style="font-size:40px">check_circle</span><br>True</button><button class="tf-btn ${quizAnswers[index] === "false" ? "active" : ""}" onclick="setAnswer(${index}, 'false')"><span class="icon" style="font-size:40px">cancel</span><br>False</button></div></div>`;
+    }
+
+    function renderScorecard(chapter, result) {
+      return `
+        <main class="page scorecard">
+          <section class="card score-hero">
+            <span class="icon" style="font-size:80px;color:var(--green)">stars</span>
+            <h1 style="margin:8px 0;color:var(--primary);font-size:40px">Great Job, ${escapeHtml(currentUser().name)}!</h1>
+            <p class="muted">You've completed ${escapeHtml(chapter.title)}.</p>
+            <div class="score-grid"><div><span class="big-num">${result.score} / ${result.total}</span><span class="label">Score</span></div><div><span class="big-num">${result.percent}%</span><span class="label">Grade</span></div><div><span class="big-num">Saved</span><span class="label">Attempt</span></div></div>
+            <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap"><button class="btn" onclick="setView('dashboard')">Return to Lessons</button><button class="btn ghost" onclick="quizSubmitted=null;setView('quiz')">Try Again</button></div>
+          </section>
+          <h2 style="color:var(--primary)">Detailed Review</h2>
+          ${result.review.map(item => `<div class="card review ${item.correct ? "" : "bad"}"><strong style="color:${item.correct ? "var(--green)" : "var(--coral)"}"><span class="icon">${item.correct ? "check_circle" : "error"}</span> Question ${item.index + 1}: ${item.correct ? "Correct" : "Needs Improvement"}</strong><p><strong>${escapeHtml(item.question)}</strong></p><p class="muted">Your answer: ${escapeHtml(item.given || "No answer")}</p>${item.correct ? "" : `<div class="error"><strong>Correction:</strong> ${escapeHtml(item.answer)}</div>`}</div>`).join("")}
+        </main>
+      `;
+    }
+
+    function renderProfile() {
+      const attempts = userAttempts().slice().reverse();
+      return appShell(`
+        <main class="page">
+          <div class="section-head"><h1 style="color:var(--primary)">Profile & Quiz History</h1><button class="btn ghost" onclick="setView('dashboard')">Back</button></div>
+          <div class="card panel">
+            <table class="table"><thead><tr><th>Chapter</th><th>Score</th><th>Date</th></tr></thead><tbody>${attempts.length ? attempts.map(attempt => `<tr><td>${escapeHtml(chapterById(attempt.chapterId)?.title || "Deleted chapter")}</td><td>${attempt.score}/${attempt.total} (${attempt.percent}%)</td><td>${new Date(attempt.completedAt).toLocaleString()}</td></tr>`).join("") : `<tr><td colspan="3">No attempts yet.</td></tr>`}</tbody></table>
+          </div>
+        </main>
+      `);
+    }
+
+    function renderAdmin() {
+      return appShell(`
+        <main class="page">
+          <div class="hero" style="grid-template-columns:1fr"><div><h1>Admin Dashboard</h1><p>Create sections, manage chapters, add Q&A cards, and configure quizzes. Everything is stored locally in this browser.</p></div></div>
+          <section class="admin-layout">
+            <aside class="card admin-nav">
+              <button class="btn ${adminTab === "content" ? "" : "ghost"}" onclick="adminTab='content';render()"><span class="icon">library_books</span>Content</button>
+              <button class="btn ${adminTab === "create" ? "" : "ghost"}" onclick="adminTab='create';render()"><span class="icon">add_circle</span>Add Chapter</button>
+              <button class="btn ${adminTab === "users" ? "" : "ghost"}" onclick="adminTab='users';render()"><span class="icon">groups</span>Users</button>
+            </aside>
+            <section>${adminTab === "create" ? renderAdminCreate() : adminTab === "users" ? renderAdminUsers() : renderAdminContent()}</section>
+          </section>
+        </main>
+      `);
+    }
+
+    function renderAdminContent() {
+      return `<div class="card panel"><div class="section-head"><h2>Sections & Chapters</h2><button class="btn secondary" onclick="seedReset()">Reset Demo Content</button></div><table class="table"><thead><tr><th>Subject</th><th>Chapter</th><th>Q&A</th><th>Quiz</th><th></th></tr></thead><tbody>${state.chapters.map(chapter => `<tr><td>${escapeHtml(sectionById(chapter.sectionId)?.name)}</td><td><strong>${escapeHtml(chapter.title)}</strong><br><span class="muted">${escapeHtml(chapter.summary)}</span></td><td>${chapter.qa.length} cards</td><td>${chapter.quiz.length} questions</td><td><button class="btn warn" onclick="deleteChapter('${chapter.id}')">Delete</button></td></tr>`).join("")}</tbody></table></div>`;
+    }
+
+    function renderAdminCreate() {
+      return `<form class="card panel" onsubmit="addChapter(event)"><h2 style="color:var(--primary);margin-top:0">Add Chapter</h2><div class="form-grid"><div class="field"><label>Subject</label><select id="newSection">${state.sections.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join("")}</select></div><div class="field"><label>Title</label><input id="newTitle" required placeholder="Chapter 5: Earth Systems"></div><div class="field span-2"><label>Summary</label><input id="newSummary" required placeholder="Short chapter description"></div><div class="field span-2"><label>Q&A Cards</label><textarea id="newQa" required placeholder="Question | Answer&#10;Question | Answer"></textarea></div><div class="field span-2"><label>Quiz Questions</label><textarea id="newQuiz" required placeholder="mcq | Question | Option A, Option B, Option C, Option D | Correct Answer&#10;fill | Question with blank | Correct Answer&#10;tf | True/false statement | true"></textarea></div></div><button class="btn" type="submit">Create Chapter</button></form>`;
+    }
+
+    function renderAdminUsers() {
+      return `<div class="card panel"><h2 style="color:var(--primary);margin-top:0">Users</h2><table class="table"><thead><tr><th>Name</th><th>Role</th><th>Section</th></tr></thead><tbody>${state.users.map(user => `<tr><td>${escapeHtml(user.name)}</td><td>${escapeHtml(user.role)}</td><td>${escapeHtml(user.section)}</td></tr>`).join("")}</tbody></table></div>`;
+    }
+
+    function render() {
+      const app = document.getElementById("app");
+      if (view === "auth") app.innerHTML = renderAuth();
+      if (view === "dashboard") app.innerHTML = renderDashboard();
+      if (view === "study") app.innerHTML = renderStudy();
+      if (view === "quiz") app.innerHTML = renderQuiz();
+      if (view === "profile") app.innerHTML = renderProfile();
+      if (view === "admin") app.innerHTML = renderAdmin();
+    }
+
+    async function login(event) {
+      event.preventDefault();
+      const name = $("#name").value.trim().toLowerCase();
+      const passwordHash = await hashPassword($("#password").value);
+      const user = state.users.find(item => item.name.toLowerCase() === name && item.passwordHash === passwordHash);
+      if (!user) { document.getElementById("app").innerHTML = renderAuth("Name or password is incorrect."); return; }
+      session = { id: user.id, role: user.role };
+      localStorage.setItem("portal8-session", JSON.stringify(session));
+      setView(user.role === "admin" ? "admin" : "dashboard");
+    }
+    async function signup(event) {
+      event.preventDefault();
+      const name = $("#name").value.trim();
+      if (state.users.some(user => user.name.toLowerCase() === name.toLowerCase())) { document.getElementById("app").innerHTML = renderAuth("That name is already registered."); return; }
+      if ($("#password").value !== $("#confirmPassword").value) { document.getElementById("app").innerHTML = renderAuth("Passwords do not match."); return; }
+      const user = { id: uid(), name, passwordHash: await hashPassword($("#password").value), role: "student", section: "8A" };
+      state.users.push(user);
+      saveState();
+      session = { id: user.id, role: user.role };
+      localStorage.setItem("portal8-session", JSON.stringify(session));
+      setView("dashboard");
+    }
+    function logout() { session = null; localStorage.removeItem("portal8-session"); setView("auth"); }
+    function openDrawer(sectionId) { selectedSubjectId = sectionId; render(); requestAnimationFrame(() => { $("#drawer").classList.add("open"); $("#drawerOverlay").classList.add("open"); }); }
+    function closeDrawer() { $("#drawer")?.classList.remove("open"); $("#drawerOverlay")?.classList.remove("open"); }
+    function startChapter(chapterId) { selectedChapterId = chapterId; setView("study"); }
+    function continueLastLesson() { const chapter = chaptersFor(selectedSubjectId)[0] || state.chapters[0]; startChapter(chapter.id); }
+    function moveFlash(delta) { flashIndex = Math.max(0, Math.min(chapterById(selectedChapterId).qa.length - 1, flashIndex + delta)); render(); }
+    function startQuiz() { quizAnswers = {}; quizSubmitted = null; setView("quiz"); }
+    function setAnswer(index, value) { quizAnswers[index] = value; render(); }
+    function answerProgress(chapter) { return Math.round((Object.keys(quizAnswers).length / chapter.quiz.length) * 100); }
+    function normalize(value) { return String(value || "").trim().toLowerCase(); }
+    function submitQuiz() {
+      const chapter = chapterById(selectedChapterId);
+      let score = 0;
+      const review = chapter.quiz.map((question, index) => {
+        const given = quizAnswers[index] || "";
+        const correct = normalize(given) === normalize(question.answer);
+        if (correct) score++;
+        return { index, question: question.question, given, answer: question.answer, correct };
+      });
+      quizSubmitted = { score, total: chapter.quiz.length, percent: Math.round((score / chapter.quiz.length) * 100), review };
+      state.attempts.push({ id: uid(), userId: session.id, chapterId: selectedChapterId, score, total: chapter.quiz.length, percent: quizSubmitted.percent, completedAt: new Date().toISOString() });
+      saveState();
+      render();
+    }
+    function addChapter(event) {
+      event.preventDefault();
+      const qa = $("#newQa").value.split("\n").map(line => line.split("|").map(part => part.trim())).filter(parts => parts.length >= 2).map(parts => [parts[0], parts[1]]);
+      const quiz = $("#newQuiz").value.split("\n").map(line => {
+        const parts = line.split("|").map(part => part.trim());
+        if (parts[0] === "mcq") return { type: "mcq", question: parts[1], options: (parts[2] || "").split(",").map(x => x.trim()), answer: parts[3] };
+        if (parts[0] === "tf") return { type: "tf", question: parts[1], answer: normalize(parts[2]) === "true" ? "true" : "false" };
+        return { type: "fill", question: parts[1], answer: parts[2] };
+      }).filter(item => item.question && item.answer);
+      state.chapters.push({ id: uid(), sectionId: $("#newSection").value, title: $("#newTitle").value, summary: $("#newSummary").value, qa, quiz });
+      saveState();
+      adminTab = "content";
+      render();
+    }
+    function deleteChapter(id) { state.chapters = state.chapters.filter(chapter => chapter.id !== id); saveState(); render(); }
+    function seedReset() { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem("portal8-session"); location.reload(); }
+    window.addEventListener("keydown", event => {
+      if (view !== "study") return;
+      if (event.key === "ArrowRight") moveFlash(1);
+      if (event.key === "ArrowLeft") moveFlash(-1);
+      if (event.code === "Space") { event.preventDefault(); $("#flashcard")?.classList.toggle("flipped"); }
+    });
+    render();
+  </script>
+</body>
+
+</html>
