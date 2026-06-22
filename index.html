@@ -47,7 +47,7 @@
       margin: 0;
       background: var(--surface);
       color: var(--ink);
-      min-width: 320px;
+      min-width: 370px;
     }
 
     button,
@@ -989,6 +989,49 @@
       justify-content: flex-start;
     }
 
+    .import-drop {
+      display: grid;
+      gap: 16px;
+      place-items: center;
+      min-height: 210px;
+      padding: 32px;
+      border: 2px dashed var(--outline);
+      border-radius: 16px;
+      background: var(--surface-low);
+      text-align: center;
+    }
+
+    .import-drop .icon {
+      color: var(--primary);
+      font-size: 46px;
+    }
+
+    .code-sample {
+      overflow: auto;
+      margin: 0;
+      padding: 16px;
+      border-radius: 8px;
+      background: #1a1b21;
+      color: #f1f0f7;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre;
+    }
+
+    .notice {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .notice.bad {
+      background: var(--coral-soft);
+      color: #93000a;
+    }
+
     .table {
       width: 100%;
       border-collapse: collapse;
@@ -1122,6 +1165,7 @@
     let quizAnswers = {};
     let quizSubmitted = null;
     let adminTab = "content";
+    let importStatus = null;
 
     function defaultState() {
       return {
@@ -1233,7 +1277,14 @@
     function chaptersFor(sectionId) { return state.chapters.filter(chapter => chapter.sectionId === sectionId); }
     function chapterById(id) { return state.chapters.find(chapter => chapter.id === id); }
     function sectionById(id) { return state.sections.find(section => section.id === id); }
+    function findSection(value) {
+      const key = normalize(value);
+      return state.sections.find(section => normalize(section.id) === key || normalize(section.name) === key);
+    }
     function userAttempts() { return state.attempts.filter(attempt => attempt.userId === session?.id); }
+    function sectionOptions(selectedId = state.sections[0].id) {
+      return state.sections.map(s => `<option value="${s.id}" ${s.id === selectedId ? "selected" : ""}>${escapeHtml(s.name)}</option>`).join("");
+    }
 
     function setView(next) {
       view = next;
@@ -1365,13 +1416,13 @@
         <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
         <aside id="drawer" class="drawer">
           <div class="section-head"><div><h2>${escapeHtml(section.name)} Chapters</h2><span class="muted">Select a topic to start studying</span></div><button class="btn ghost" onclick="closeDrawer()"><span class="icon">close</span></button></div>
-          ${chaptersFor(section.id).map(chapter => `
+          ${chaptersFor(section.id).length ? chaptersFor(section.id).map(chapter => `
             <button class="card chapter-card" onclick="startChapter('${chapter.id}')">
               <div class="section-head" style="margin-bottom:10px"><h2 style="font-size:22px;color:var(--ink)">${escapeHtml(chapter.title)}</h2><span class="tag">Ready to Study</span></div>
               <p class="muted">${escapeHtml(chapter.summary)}</p>
               <strong style="color:var(--primary);display:flex;gap:8px;align-items:center">Begin Lesson <span class="icon">arrow_forward</span></strong>
             </button>
-          `).join("")}
+          `).join("") : `<div class="card panel"><strong>No chapters yet.</strong><p class="muted">Ask your teacher to import or create a chapter for this subject.</p></div>`}
         </aside>
       `;
     }
@@ -1475,14 +1526,15 @@
     function renderAdmin() {
       return appShell(`
         <main class="page">
-          <div class="hero" style="grid-template-columns:1fr"><div><h1>Admin Dashboard</h1><p>Create sections, manage chapters, add Q&A cards, and configure quizzes. Everything is stored locally in this browser.</p></div></div>
+          <div class="hero" style="grid-template-columns:1fr"><div><h1>Admin Dashboard</h1><p>Create sections, import chapters from your desktop, add Q&A cards, and configure quizzes. Everything is stored locally in this browser.</p></div></div>
           <section class="admin-layout">
             <aside class="card admin-nav">
               <button class="btn ${adminTab === "content" ? "" : "ghost"}" onclick="adminTab='content';render()"><span class="icon">library_books</span>Content</button>
+              <button class="btn ${adminTab === "import" ? "" : "ghost"}" onclick="adminTab='import';render()"><span class="icon">upload_file</span>Import</button>
               <button class="btn ${adminTab === "create" ? "" : "ghost"}" onclick="adminTab='create';render()"><span class="icon">add_circle</span>Add Chapter</button>
               <button class="btn ${adminTab === "users" ? "" : "ghost"}" onclick="adminTab='users';render()"><span class="icon">groups</span>Users</button>
             </aside>
-            <section>${adminTab === "create" ? renderAdminCreate() : adminTab === "users" ? renderAdminUsers() : renderAdminContent()}</section>
+            <section>${adminTab === "create" ? renderAdminCreate() : adminTab === "import" ? renderAdminImport() : adminTab === "users" ? renderAdminUsers() : renderAdminContent()}</section>
           </section>
         </main>
       `);
@@ -1493,7 +1545,53 @@
     }
 
     function renderAdminCreate() {
-      return `<form class="card panel" onsubmit="addChapter(event)"><h2 style="color:var(--primary);margin-top:0">Add Chapter</h2><div class="form-grid"><div class="field"><label>Subject</label><select id="newSection">${state.sections.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join("")}</select></div><div class="field"><label>Title</label><input id="newTitle" required placeholder="Chapter 5: Earth Systems"></div><div class="field span-2"><label>Summary</label><input id="newSummary" required placeholder="Short chapter description"></div><div class="field span-2"><label>Q&A Cards</label><textarea id="newQa" required placeholder="Question | Answer&#10;Question | Answer"></textarea></div><div class="field span-2"><label>Quiz Questions</label><textarea id="newQuiz" required placeholder="mcq | Question | Option A, Option B, Option C, Option D | Correct Answer&#10;fill | Question with blank | Correct Answer&#10;tf | True/false statement | true"></textarea></div></div><button class="btn" type="submit">Create Chapter</button></form>`;
+      return `<form class="card panel" onsubmit="addChapter(event)"><h2 style="color:var(--primary);margin-top:0">Add Chapter</h2><div class="form-grid"><div class="field"><label>Subject</label><select id="newSection">${sectionOptions()}</select></div><div class="field"><label>Title</label><input id="newTitle" required placeholder="Chapter 5: Earth Systems"></div><div class="field span-2"><label>Summary</label><input id="newSummary" required placeholder="Short chapter description"></div><div class="field span-2"><label>Q&A Cards</label><textarea id="newQa" required placeholder="Question | Answer&#10;Question | Answer"></textarea></div><div class="field span-2"><label>Quiz Questions</label><textarea id="newQuiz" required placeholder="mcq | Question | Option A, Option B, Option C, Option D | Correct Answer&#10;fill | Question with blank | Correct Answer&#10;tf | True/false statement | true"></textarea></div></div><button class="btn" type="submit">Create Chapter</button></form>`;
+    }
+
+    function renderAdminImport() {
+      const sample = `{
+  "sectionId": "science",
+  "title": "Chapter 6: Energy Transfer",
+  "summary": "Read key ideas, study Q&A cards, then answer the quiz.",
+  "qa": [
+    ["What is conduction?", "Heat transfer through direct contact."],
+    ["What is radiation?", "Energy transfer through electromagnetic waves."]
+  ],
+  "quiz": [
+    {
+      "type": "mcq",
+      "question": "Which example shows conduction?",
+      "options": ["Sunlight warming Earth", "A spoon warming in soup", "Wind moving heat", "A lamp glowing"],
+      "answer": "A spoon warming in soup"
+    },
+    { "type": "fill", "question": "Heat moves from warmer areas to ____ areas.", "answer": "cooler" },
+    { "type": "tf", "question": "Radiation needs direct contact.", "answer": "false" }
+  ]
+}`;
+      return `
+        <section class="grid two-col">
+          <div class="card panel">
+            <div class="section-head">
+              <div><h2>Import From Desktop</h2><span class="muted">Upload a JSON file with one chapter or an array of chapters.</span></div>
+              <button class="btn ghost" onclick="downloadImportTemplate()"><span class="icon">download</span>Template</button>
+            </div>
+            <div class="import-drop">
+              <span class="icon">upload_file</span>
+              <div>
+                <strong>Choose a chapter file</strong>
+                <p class="muted">Imported content appears under the selected subject for students after login.</p>
+              </div>
+              <input id="importFile" type="file" accept=".json,application/json" onchange="importChaptersFromFile(event)">
+            </div>
+            ${importStatus ? `<div class="notice ${importStatus.ok ? "" : "bad"}">${escapeHtml(importStatus.message)}</div>` : ""}
+          </div>
+          <div class="card panel">
+            <h2 style="color:var(--primary);margin-top:0">File Format</h2>
+            <p class="muted">Use an existing subject id: ${state.sections.map(section => `<strong>${escapeHtml(section.id)}</strong>`).join(", ")}.</p>
+            <pre class="code-sample">${escapeHtml(sample)}</pre>
+          </div>
+        </section>
+      `;
     }
 
     function renderAdminUsers() {
@@ -1569,6 +1667,92 @@
       saveState();
       adminTab = "content";
       render();
+    }
+
+    function normalizeQa(items) {
+      if (!Array.isArray(items)) return [];
+      return items.map(item => {
+        if (Array.isArray(item)) return [item[0], item[1]].map(part => String(part || "").trim());
+        return [item.question, item.answer].map(part => String(part || "").trim());
+      }).filter(item => item[0] && item[1]);
+    }
+
+    function normalizeQuiz(items) {
+      if (!Array.isArray(items)) return [];
+      return items.map(item => {
+        const type = normalize(item.type || "fill");
+        const question = String(item.question || "").trim();
+        const answer = String(item.answer ?? "").trim();
+        if (!question || !answer) return null;
+        if (type === "mcq" || type === "multiple-choice") {
+          const options = Array.isArray(item.options) ? item.options.map(option => String(option).trim()).filter(Boolean) : [];
+          return options.length ? { type: "mcq", question, options, answer } : null;
+        }
+        if (type === "tf" || type === "true-false" || type === "true/false") {
+          return { type: "tf", question, answer: normalize(answer) === "true" ? "true" : "false" };
+        }
+        return { type: "fill", question, answer };
+      }).filter(Boolean);
+    }
+
+    function normalizeImportedChapter(raw, index) {
+      const section = findSection(raw.sectionId || raw.subjectId || raw.subject);
+      if (!section) throw new Error(`Chapter ${index + 1} has an unknown subject id.`);
+      const title = String(raw.title || raw.chapter || "").trim();
+      const summary = String(raw.summary || raw.description || "Imported chapter").trim();
+      const qa = normalizeQa(raw.qa || raw.questionsAndAnswers || raw.cards);
+      const quiz = normalizeQuiz(raw.quiz || raw.quizzes || raw.questions);
+      if (!title) throw new Error(`Chapter ${index + 1} is missing a title.`);
+      if (!qa.length) throw new Error(`Chapter ${index + 1} needs at least one Q&A item.`);
+      if (!quiz.length) throw new Error(`Chapter ${index + 1} needs at least one quiz question.`);
+      return { id: uid(), sectionId: section.id, title, summary, qa, quiz, importedAt: new Date().toISOString() };
+    }
+
+    async function importChaptersFromFile(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        const rawChapters = Array.isArray(data) ? data : Array.isArray(data.chapters) ? data.chapters : [data];
+        const chapters = rawChapters.map(normalizeImportedChapter);
+        state.chapters.push(...chapters);
+        selectedSubjectId = chapters[0].sectionId;
+        selectedChapterId = chapters[0].id;
+        importStatus = { ok: true, message: `Imported ${chapters.length} chapter${chapters.length === 1 ? "" : "s"} from ${file.name}. Students can now open them from the subject dashboard.` };
+        saveState();
+      } catch (error) {
+        importStatus = { ok: false, message: error.message || "The file could not be imported. Check that it is valid JSON." };
+      }
+      event.target.value = "";
+      render();
+    }
+
+    function downloadImportTemplate() {
+      const template = {
+        chapters: [
+          {
+            sectionId: "science",
+            title: "Chapter 6: Energy Transfer",
+            summary: "Read key ideas, study Q&A cards, then answer the quiz.",
+            qa: [
+              ["What is conduction?", "Heat transfer through direct contact."],
+              ["What is radiation?", "Energy transfer through electromagnetic waves."]
+            ],
+            quiz: [
+              { type: "mcq", question: "Which example shows conduction?", options: ["Sunlight warming Earth", "A spoon warming in soup", "Wind moving heat", "A lamp glowing"], answer: "A spoon warming in soup" },
+              { type: "fill", question: "Heat moves from warmer areas to ____ areas.", answer: "cooler" },
+              { type: "tf", question: "Radiation needs direct contact.", answer: "false" }
+            ]
+          }
+        ]
+      };
+      const blob = new Blob([JSON.stringify(template, null, 2)], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "portal8-chapter-import-template.json";
+      link.click();
+      URL.revokeObjectURL(link.href);
     }
     function deleteChapter(id) { state.chapters = state.chapters.filter(chapter => chapter.id !== id); saveState(); render(); }
     function seedReset() { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem("portal8-session"); location.reload(); }
